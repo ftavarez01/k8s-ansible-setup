@@ -1,7 +1,7 @@
 # Kubernetes (k8s) ansible setup
 Ansible playbooks for setting up Linux servers and deploying Kubernetes (K8s).
 
-![Texto alternativo para tu imagen](./images/ansible-k8s-diagram.jpeg)
+![Texto alternativo para tu imagen](./images/ansible-k8s-diagram.png)
 
 Project Description
 
