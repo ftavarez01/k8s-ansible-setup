@@ -55,7 +55,7 @@ The servers where the Kubernetes components will be installed must meet the foll
     * [Here you can add a reference to your script if you have one to help with public key distribution]: You can use the `./scripts/[your_ssh_script_name].sh` script included in this repository to automate this step.
 
     [**-> YOU CAN INSERT THE SSH KEY FLOW DIAGRAM HERE <-**]
-    ![SSH Key Flow Diagram](images/ssh-connectivity.png) # Example: save your image in ./images/ssh_key_flow.png
+    ![SSH Key Flow Diagram](images/ssh-connectivity.png)
 
 * **User with `sudo`:** The `ansible_user` must have permissions to execute commands as `root` using `sudo` **without being prompted for a password**. This is essential for Ansible to perform administrative tasks.
     * [Optional: You can add a link to how to configure sudoers without a password if necessary, if your playbook doesn't handle this].
