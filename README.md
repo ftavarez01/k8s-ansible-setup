@@ -28,6 +28,7 @@ The machine from which you will execute the `ansible-playbook` commands must hav
 * **Operating System:** A compatible Linux-based system (e.g., Ubuntu, Fedora, CentOS/Oracle Linux, macOS, WSL on Windows).
 * **Python 3.x:** Python version 3.x installed and correctly configured.
 * **Ansible:** Ansible version [Specify minimum version if applicable, e.g., 2.10 or higher] or later installed.
+  
     ```bash
     # Installation using pip (recommended in a virtual environment)
     python3 -m pip install ansible
