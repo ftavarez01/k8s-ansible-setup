@@ -190,7 +190,7 @@ Once your Kubernetes cluster is up and running, you'll want to interact with it 
         sudo apt update
         sudo apt install -y kubectl
         # Or according to the official Kubernetes documentation:
-        # curl -LO "[https://dl.k8s.io/release/$(kubectl](https://dl.k8s.io/release/$(kubectl) version --client --output=json | jq -r .clientVersion.gitVersion)/bin/linux/amd64/kubectl"
+        # curl -LO "[[https://dl.k8s.io/release/$(kubectl](https://dl.k8s.io/release/$(kubectl) version --client --output=json | jq -r .clientVersion.gitVersion)/bin/linux/amd64/kubectl"
         # sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
         ```
     * **macOS:**
@@ -198,27 +198,25 @@ Once your Kubernetes cluster is up and running, you'll want to interact with it 
         brew install kubectl
         ```
     * **Windows:**
-        You can install `kubectl` using Chocolatey or by following the instructions in the official Kubernetes documentation.
+        You can install `kubectl` using **Chocolatey** or by following the instructions in the **official Kubernetes documentation**.
 
     Refer to the [official Kubernetes documentation](https://kubernetes.io/docs/tasks/tools/install-kubectl/) for the most up-to-date and detailed instructions for your operating system.
 
 2.  **Configure access to your cluster (obtain the `kubeconfig`):**
-    For your local `kubectl` to communicate with your Kubernetes cluster, it needs a configuration file called `kubeconfig`. This file contains the credentials and endpoint information for your cluster.
+    For your local `kubectl` to communicate with your Kubernetes cluster, it needs a configuration file called `kubeconfig`. This file contains the **credentials** and the **endpoint information for your cluster**.
 
-    Typically, the `kubeconfig` file is generated on the master node of your cluster during installation. You will need to copy this file from the master node to your local machine using `scp` (if you have SSH access to the master node):
+    Typically, the `kubeconfig` file is generated on the **master node** of your cluster during installation. You will need to copy this file from the master node to your local machine using `scp` (if you have SSH access to the master node):
 
     ```bash
     scp root@<MASTER_NODE_IP_OR_HOSTNAME>:/etc/kubernetes/admin.conf ~/.kube/config
     ```
 
-    * Replace `<MASTER_NODE_IP_OR_HOSTNAME>` with the IP address or hostname of your master node.
+    * Replace `<MASTER_NODE_IP_OR_HOSTNAME>` with the IP address or hostname of your **master node**.
     * If you already have a `~/.kube` directory, you might want to copy the contents of the `admin.conf` file into your existing `~/.kube/config` file or configure a `KUBECONFIG` environment variable to point to the new file.
 
-    **Important:** Be cautious when transferring the `kubeconfig` file, as it contains sensitive credentials for accessing your cluster. It is recommended to restrict the file permissions on your local machine using the following command:
+    **Important!** Be cautious when transferring the `kubeconfig` file, as it contains **sensitive credentials** for accessing your cluster. It is recommended to restrict the file permissions on your local machine using the following command:
 
     ```bash
     chmod 600 ~/.kube/config
     ```
-
-
   
