@@ -74,11 +74,11 @@ The servers where the Kubernetes components will be installed must meet the foll
 ```ini
 # Example of your Ansible inventory file (./hosts)
 [master]
-master ansible_host=IP_DEL_NODO_MASTER
+master ansible_host=MASTER_NODE_IP_OR_HOSTNAME
 
 [worker]
-worker1 ansible_host=IP_DEL_NODO_WORKER_1
-worker2 ansible_host=IP_DEL_NODO_WORKER_2
+worker1 ansible_host=WORKER_NODE_1_IP_OR_HOSTNAME
+worker2 ansible_host=WORKER_NODE_2_IP_OR_HOSTNAME
 # Add more worker nodes as needed
 
 #[all:vars]
