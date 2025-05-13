@@ -85,4 +85,104 @@ worker2 ansible_host=IP_DEL_NODO_WORKER_2
 #ansible_user=root
 #ansible_ssh_private_key_file=~/.ssh/path/to/your/private_key # Uncomment and adjust if needed
 
+## Installation and Configuration
+
+Follow these steps to deploy your Kubernetes cluster using the Ansible playbooks:
+
+1.  **Clone the Repository:**
+    Obtain a local copy of the playbooks and project files by cloning the repository from GitHub.
+    ```bash
+    git clone [https://github.com/ftavarez01/k8s-ansible-setup.git](https://github.com/ftavarez01/k8s-ansible-setup.git)
+    cd k8s-ansible-setup
+    ```
+
+2.  **Configure the Ansible Inventory File:**
+    Within the cloned repository directory, you will find an inventory file named `hosts`. You need to edit this file to specify the IP addresses or hostnames of your Ubuntu servers where you will deploy Kubernetes.
+
+    Open the `hosts` file with a text editor and update the `[master]` and `[worker]` sections with your server information.
+
+    ```ini
+    # Example inventory file (./hosts)
+    [master]
+    master ansible_host=MASTER_NODE_IP_OR_HOSTNAME
+
+    [worker]
+    worker1 ansible_host=WORKER_NODE_1_IP_OR_HOSTNAME
+    worker2 ansible_host=WORKER_NODE_2_IP_OR_HOSTNAME
+    # Add more worker nodes as needed
+
+    [all:vars]
+    ansible_user=root # Ensure 'root' can SSH without a password
+    # ansible_ssh_private_key_file=~/.ssh/path/to/your/private_key # Uncomment and adjust if you are not using the default key
+    ```
+
+    * **Replace** `MASTER_NODE_IP_OR_HOSTNAME`, `WORKER_NODE_1_IP_OR_HOSTNAME`, `WORKER_NODE_2_IP_OR_HOSTNAME`, etc., with the actual IP addresses or hostnames of your servers.
+    * **Verify** that the `root` user has passwordless SSH access configured (using public key authentication).
+    * **Optional:** If you are not using the default SSH private key, uncomment and adjust the path to your private key file.
+
+3.  **Ensure SSH Access and Execute the Key Distribution Script:**
+    Before running the Ansible playbook, you need to ensure that the public SSH key of your control machine is correctly installed on the managed nodes to allow passwordless authentication.
+
+    If you have included a script to automate this process (for example, `distribute-ssh-keys.sh`), navigate to the directory where the script is located (likely the repository root or a subdirectory like `./scripts/`) and execute it as follows:
+
+    ```bash
+    chmod +x distribute-ssh-keys.sh
+    ./distribute-ssh-keys.sh
+    ```
+
+    * If your script requires additional options or arguments, make sure to provide them. Currently, your script does not appear to need arguments.
+
+    Once the script has been executed successfully on all your managed nodes, SSH access with public key authentication should be configured.
+
+    ![SSH Key Flow Diagram](images/ssh-connectivity.png)
+
+4.  **Execute the Deployment Playbook:**
+    After configuring your inventory file (`hosts`) and ensuring that SSH access is working correctly, you can execute the Ansible playbook to start the Kubernetes cluster deployment.
+
+    Navigate to the root directory of the cloned repository and run the following Ansible command:
+
+    ```bash
+    ansible-playbook -i hosts site.yaml
+    ```
+
+    * The `-i hosts` option tells Ansible to use the `hosts` file in the current directory as the inventory. If your inventory file has a different name, adjust it accordingly (e.g., `-i /path/to/my_inventory`).
+
+    Wait for the playbook to complete. The time it takes will depend on the number of nodes and your network speed. Once finished, your Kubernetes cluster should be deployed and configured.
+
+5.  **Verify the Kubernetes Installation:**
+    After the Ansible playbook has completed without errors, you can verify that the Kubernetes cluster has been deployed correctly using the `kubectl` tool.
+
+    **From your control machine:**
+
+    Run the following commands:
+
+    ```bash
+    kubectl get nodes
+    kubectl get pods -n kube-system
+    ```
+
+    The `kubectl get nodes` command should show all the nodes in a `Ready` state. The `kubectl get pods -n kube-system` command should show the essential system pods in a `Running` state.
+
+    If the `kubectl get nodes` command does not show the nodes as `Ready` after a few minutes, check the logs of the control plane pods to identify potential errors.
+
+    ```bash
+    kubectl logs -n kube-system <apiserver-pod-name>
+    ```
+
+    Replace `<apiserver-pod-name>` with the name of the apiserver pod (you can find it with `kubectl get pods -n kube-system`).
+
+    If you continue to experience issues, check the log files on your nodes for more information.
+
+    * On master nodes: `/var/log/kube-apiserver.log`, `/var/log/kube-scheduler.log`, `/var/log/kube-controller-manager.log`
+    * On worker nodes: `/var/log/kubelet.log`, `/var/log/kube-proxy.log`
+
+    These logs can provide clues about what is preventing the cluster from starting correctly.
+
+Regarding your repository:
+
+* The main playbook is named `site.yaml`.
+* The `distribute-ssh-keys.sh` script does not appear to need arguments, but it's important that the user runs `chmod +x distribute-ssh-keys.sh` to make it executable.
+* I've added troubleshooting suggestions, including checking logs, to help users diagnose deployment issues.
+
+What do you think of these changes? Would you like to add anything else, such as instructions for configuring `kubectl` locally?
   
