@@ -176,7 +176,7 @@ Follow these steps to deploy your Kubernetes cluster using the Ansible playbooks
     These logs can provide clues about what is preventing the cluster from starting correctly.
 
 
-Markdown
+
 
 ## Using Your Kubernetes Cluster
 
