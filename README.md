@@ -65,11 +65,8 @@ The servers where the Kubernetes components will be installed must meet the foll
 
 ### 3. Ansible Inventory
 
-* Configure your Ansible inventory file ([Specify the actual name of your inventory file, e.g., `inventory` or `hosts`]).
-* Define your control plane node(s) under the `[control_plane]` group and your worker nodes under the `[worker]` group.
-* Ensure you specify the **SSH hostname or IP address** for each node using the `ansible_host` variable.
-* Since you are using the `root` user, you might not need to explicitly define `ansible_user` if `root` is the default user Ansible tries. However, if you encounter issues, you can explicitly set `ansible_user=root` under the `[all:vars]` group or within the group/host definitions.
-* If you are not using the default SSH private key (`~/.ssh/id_rsa`), you will need to specify the path to your private key file using the `ansible_ssh_private_key_file` variable, either under `[all:vars]` or within the group/host definitions.
+* Configure your Ansible inventory file (by default, Ansible looks for `/etc/ansible/hosts` or a file named `hosts` in the current directory).
+* Edit the `/etc/ansible/hosts` file (or your custom inventory file if you are using one)...
 
 ```ini
 # Example of your Ansible inventory file (./[Specify the actual name])
