@@ -1,5 +1,10 @@
+[all_nodes]
+controlplane ansible_host=IP_NODO_CONTROLPLANE
+worker1 ansible_host=IP_NODO_WORKER_1
+worker2 ansible_host=IP_NODO_WORKER_2
+
 [master]
-controlplane ansible_host=IP_DEL_NODO_CONTROL
+controlplane ansible_host=IP_NODO_CONTROLPLANE
 
 [worker]
 worker1 ansible_host=IP_DEL_NODO_WORKER_1
