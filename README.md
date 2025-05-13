@@ -219,4 +219,74 @@ Once your Kubernetes cluster is up and running, you'll want to interact with it 
     ```bash
     chmod 600 ~/.kube/config
     ```
+
+3.  **Basic `kubectl` command examples:**
+    Once `kubectl` is configured to communicate with your cluster, you can start interacting with it. Here are some basic commands to get you started:
+
+    * **View the status of your nodes:**
+        ```bash
+        kubectl get nodes
+        ```
+        This command displays all the nodes in your cluster and their status (Ready, NotReady, etc.). Ensure that all your nodes are in the `Ready` state.
+
+    * **View pods across all namespaces:**
+        ```bash
+        kubectl get pods --all-namespaces
+        ```
+        This command lists all the pods running in the cluster, organized by namespace. You should see the system pods in the `kube-system` namespace.
+
+    * **View pods in a specific namespace (example: `kube-system`):**
+        ```bash
+        kubectl get pods -n kube-system
+        ```
+        This command filters the pods to show only those running in the `kube-system` namespace, where the essential cluster components reside.
+
+    * **View deployments in the default namespace:**
+        ```bash
+        kubectl get deployments
+        ```
+        Deployments represent stateless applications running in your cluster. This command shows the deployments in the default namespace.
+
+    * **View services in the default namespace:**
+        ```bash
+        kubectl get services
+        ```
+        Services provide a way to access applications running in pods. This command displays the services in the default namespace.
+
+    * **Get detailed information about a specific resource (example: a node named `master`):**
+        ```bash
+        kubectl describe node master
+        ```
+        Replace `master` with the name of the resource you want to inspect (it could be a node, pod, service, etc.).
+
+    These are just a few basic commands to start exploring your Kubernetes cluster. There are many more commands and options available in `kubectl`. You can refer to the [official `kubectl` documentation](https://kubernetes.io/docs/reference/kubectl/) for a comprehensive list.
+
+4.  **Accessing Deployed Applications:**
+    Once you have deployed applications to your Kubernetes cluster, you'll need a way to access them from outside the cluster. Kubernetes offers several ways to expose your applications:
+
+    * **Services of type `ClusterIP` (Internal):** This is the default service type. It provides an internal IP address within the cluster so that pods inside the cluster can communicate with each other. It is not directly accessible from outside the cluster without further exposure.
+
+    * **Services of type `NodePort`:** This type of service exposes the application on a specific port on each of the nodes in your cluster (both master and worker nodes). You can access the application using the IP address of any node in the cluster and the assigned port.
+
+        To expose a deployment as a `NodePort` service, you can use the following command:
+
+        ```bash
+        kubectl expose deployment <your-deployment-name> --type=NodePort --name=<your-service-name> --port=<internal-port> --target-port=<container-port>
+        ```
+
+        You can then access your application via `http://<any-node-ip>:<node-port>`. The `NodePort` is dynamically assigned within a configurable range (default: 30000-32767). You can see the assigned port with `kubectl get service <your-service-name> -o yaml | grep nodePort`.
+
+    * **Services of type `LoadBalancer`:** This type of service provisions a load balancer provided by your cloud provider (if you are in a cloud environment like AWS, GCP, Azure). The load balancer exposes your application via an external IP address.
+
+        To expose a deployment as a `LoadBalancer` service, you can use the following command:
+
+        ```bash
+        kubectl expose deployment <your-deployment-name> --type=LoadBalancer --name=<your-service-name> --port=<internal-port> --target-port=<container-port>
+        ```
+
+        The external IP address of the load balancer may take a few minutes to provision. You can obtain it with `kubectl get service <your-service-name> -w` (the `-w` option tells `kubectl` to wait for the external IP to be assigned).
+
+    * **Ingress:** Ingress is a more advanced way to expose HTTP and HTTPS services from outside the cluster. It requires an Ingress controller running in your cluster and allows you to define routing rules based on hostnames and paths. Configuring Ingress is beyond the scope of this basic guide, but it's a common solution for complex web applications.
+
+    For getting started, the easiest way to access your applications in a test or local environment is often by using `NodePort`. If you are deploying to a cloud provider, `LoadBalancer` might be a better option for production.
   
