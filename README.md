@@ -62,4 +62,27 @@ The servers where the Kubernetes components will be installed must meet the foll
     * Network connectivity (SSH, port 22 by default) from the control machine to all managed nodes.
     * **Internet access** from each managed node to download packages (APT), container images, and Kubernetes components.
 
+
+### 3. Ansible Inventory
+
+* Configure your Ansible inventory file ([Specify the actual name of your inventory file, e.g., `inventory` or `hosts`]).
+* Define your control plane node(s) under the `[control_plane]` group and your worker nodes under the `[worker]` group.
+* Ensure you specify the **SSH hostname or IP address** for each node using the `ansible_host` variable.
+* Since you are using the `root` user, you might not need to explicitly define `ansible_user` if `root` is the default user Ansible tries. However, if you encounter issues, you can explicitly set `ansible_user=root` under the `[all:vars]` group or within the group/host definitions.
+* If you are not using the default SSH private key (`~/.ssh/id_rsa`), you will need to specify the path to your private key file using the `ansible_ssh_private_key_file` variable, either under `[all:vars]` or within the group/host definitions.
+
+```ini
+# Example of your Ansible inventory file (./[Specify the actual name])
+[control_plane]
+controlplane ansible_host=IP_OR_HOSTNAME_OF_CONTROLPLANE
+
+[worker]
+worker1 ansible_host=IP_OR_HOSTNAME_OF_WORKER1
+worker2 ansible_host=IP_OR_HOSTNAME_OF_WORKER2
+# Add more worker nodes as needed
+
+#[all:vars]
+#ansible_user=root
+#ansible_ssh_private_key_file=~/.ssh/path/to/your/private_key # Uncomment and adjust if needed
+
   
