@@ -111,7 +111,11 @@ Follow these steps to deploy your Kubernetes cluster using the Ansible playbooks
     [worker]
     worker1 ansible_host=WORKER_NODE_1_IP_OR_HOSTNAME
     worker2 ansible_host=WORKER_NODE_2_IP_OR_HOSTNAME
-    # Add more worker nodes as needed
+
+    [all_nodes]
+    master ansible_host=MASTER_NODE_IP_OR_HOSTNAME
+    worker1 ansible_host=WORKER_NODE_1_IP_OR_HOSTNAME
+    worker2 ansible_host=WORKER_NODE_2_IP_OR_HOSTNAME
 
     ```
 
