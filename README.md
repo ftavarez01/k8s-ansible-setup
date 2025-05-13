@@ -50,15 +50,13 @@ The machine from which you will execute the `ansible-playbook` commands must hav
 The servers where the Kubernetes components will be installed must meet the following requirements:
 
 * **Operating System:** Servers running **Ubuntu Server** version [Specify exact or minimum version, e.g., 24.04 LTS].
-* **SSH Access:** SSH access configured from the control machine to the **user** that Ansible will use (`ansible_user` defined in your inventory).
-    * **Public Key Configuration:** The **public SSH key** of your control machine must be copied into the `~/.ssh/authorized_keys` file of the `ansible_user` on **each** of these nodes.
+* **SSH Access:** SSH access configured from the control machine to the **`root` user** on **each** of these nodes.
+    * **Public Key Configuration:** The **public SSH key** of your control machine must be copied into the `/root/.ssh/authorized_keys` file of the `root` user on **each** of these nodes.
     * [Here you can add a reference to your script if you have one to help with public key distribution]: You can use the `./scripts/[your_ssh_script_name].sh` script included in this repository to automate this step.
 
-    
     ![SSH Key Flow Diagram](images/ssh-connectivity.png)
 
-* **User with `sudo`:** The `ansible_user` must have permissions to execute commands as `root` using `sudo` **without being prompted for a password**. This is essential for Ansible to perform administrative tasks.
-    * [Optional: You can add a link to how to configure sudoers without a password if necessary, if your playbook doesn't handle this].
+* **Passwordless `root` Access:** The `root` user must have the ability to execute commands without being prompted for a password (this is often the default configuration for the `root` user, but ensure this is the case on your servers).
 * **Python 3.x:** Python version 3.x installed on each managed node.
 * **Network Connectivity:**
     * Network connectivity (SSH, port 22 by default) from the control machine to all managed nodes.
