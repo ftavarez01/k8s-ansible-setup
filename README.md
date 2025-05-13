@@ -134,7 +134,7 @@ Follow these steps to deploy your Kubernetes cluster using the Ansible playbooks
 
     Once the script has been executed successfully on all your managed nodes, SSH access with public key authentication should be configured.
 
-    ![SSH Key Flow Diagram](images/ssh-connectivity.png)
+    ![SSH Key Flow Diagram](images/ssh-connect.png)
 
 4.  **Execute the Deployment Playbook:**
     After configuring your inventory file (`hosts`) and ensuring that SSH access is working correctly, you can execute the Ansible playbook to start the Kubernetes cluster deployment.
