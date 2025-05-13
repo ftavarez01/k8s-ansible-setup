@@ -1,0 +1,285 @@
+- hosts: k8s
+  become: yes
+  become_user: root
+  tasks:
+
+    - name: Detener y deshabilitar firewalld
+      ansible.builtin.service:
+        name: firewalld
+        state: stopped 
+        enabled: false 
+      ignore_errors: yes
+
+    - name: Detener y deshabilitar nftables
+      ansible.builtin.service:
+        name: nftables  
+        state: stopped 
+        enabled: false # Ensure the service does not start on boot
+
+    - name: Configuring resolv.conf file
+      ansible.builtin.copy:
+        content: | 
+          nameserver 8.8.8.8
+          nameserver 8.8.4.4
+      # Busca aquí tus servidores DNS correctos
+        dest: /etc/resolv.conf
+        owner: root
+        group: root
+        mode: '0644' # Read permissions for all, write permissions for root
+      become: true   # You need root to write to /etc
+
+    - name: Updating OS Ubuntu
+      ansible.builtin.shell: sudo dpkg --configure -a && sudo apt update -y && sudo apt upgrade -y
+
+
+    - name: Install Prerequisite  Packages
+      ansible.builtin.shell: sudo apt install apt-transport-https  curl -y
+
+
+    - name: Installing Containerd on Ubuntu
+      ansible.builtin.shell: sudo apt install containerd -y
+
+    - name: Check if containerd is installed
+      shell: "containerd --version"
+      register: containerd_version
+      ignore_errors: yes  
+
+    - name: Configuring Containerd
+      shell: |
+        sudo mkdir -p /etc/containerd
+        containerd config default | sudo tee /etc/containerd/config.toml > /dev/null
+        sudo sed -i 's/SystemdCgroup = false/SystemdCgroup = true/' /etc/containerd/config.toml
+
+    - name: Restarting Containerd
+      ansible.builtin.service:
+        name: containerd
+        state: restarted
+        enabled: true
+
+    
+    - name: Delete Kubernetes repository if it exists
+      ansible.builtin.file:
+        path: /etc/apt/sources.list.d/kubernetes.list
+        state: absent
+
+          #- name: Deleting kubernetes repository key 
+    #shell: |
+    #rm -rf /etc/apt/sources.list.d/kubernetes.list 
+
+    - name: Download Kubernetes repository key
+      shell: |
+        curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.30/deb/Release.key | gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+      args:
+        creates: /etc/apt/keyrings/kubernetes-apt-keyring.gpg # Run only if the key doesn't exist
+
+    - name: Add Kubernetes repository to sources list
+      shell: |
+        echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.30/deb/ /' | tee /etc/apt/sources.list.d/kubernetes.list
+      args:
+        creates: /etc/apt/sources.list.d/kubernetes.list # Run only if the list doesn't exist
+
+    - name: Reboot all nodes (clean state)
+      ansible.builtin.reboot:
+        reboot_timeout: 300
+      become: yes
+
+    - name: Update apt package index
+      apt:
+        update_cache: yes
+
+    - name: Install kubelet and kubectl
+      apt:
+        name:
+          - kubelet=1.30.12-1.1 # Specify the exact version
+          - kubectl=1.30.12-1.1 # Specify the exact version
+          - kubeadm=1.30.12-1.1 # SPecify exact version
+        state: present
+
+    - name: Hold kubelet and kubectl versions
+      dpkg_selections:
+        name: "{{ item }}"
+        selection: hold
+      loop:
+        - kubelet
+        - kubectl
+        - kubeadm
+
+    - name: Enable service kubelet
+      ansible.builtin.systemd:
+        name: kubelet
+        enabled: true
+        masked: no
+
+    - name: Restarting kubelet agent
+      ansible.builtin.service:
+        name: kubelet
+        state: restarted
+        enabled: true
+
+
+    - name: Disable Swap on Ubuntu
+      shell: |
+
+        sudo swapoff -a
+        sudo sed -i '/ swap / s/^\(.*\)$/#\1/g' /etc/fstab
+
+    - name: Load Kernel module
+      shell: |
+
+        sudo modprobe overlay
+        sudo modprobe br_netfilter
+
+    - name: Create k8s.conf file with sysctl parameters
+      blockinfile:
+        path: /etc/sysctl.d/k8s.conf
+        create: true
+        content: |
+          net.bridge.bridge-nf-call-iptables = 1
+          net.bridge.bridge-nf-call-ip6tables = 1
+          net.ipv4.ip_forward = 1
+
+    - name: Apply sysctl parameters from all files
+      command: sudo sysctl --system
+      register: sysctl_output
+      changed_when: "'Applying' in sysctl_output.stdout" 
+        
+
+- name: Install Kubeadm Components on master node
+  hosts: master # Or specify the target node
+  become: true
+
+  tasks:
+
+    - name: Reset kubeadm
+      ansible.builtin.command: kubeadm reset -f
+      become: yes
+      ignore_errors: yes
+
+    - name: Delete directory and file related with kubeadm
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - /etc/kubernetes
+        - /var/lib/kubelet
+        - /var/lib/etcd
+        - /root/.kube # Delete kubelet configuration from root user
+
+    - name: Installing kubeadm
+      apt:
+        name:
+          - kubeadm=1.30.12-1.1 # Specify the exact version
+        state: present
+
+    - name: Hold kubeadm versions
+      dpkg_selections:
+        name: "{{ item }}"
+        selection: hold
+      loop:
+        - kubeadm
+
+    - name: Enable Container service
+      systemd:
+        name: containerd.service
+        daemon_reload: true
+        enabled: true
+
+    - name: Enable service kubelet
+      ansible.builtin.systemd:
+         name: kubelet
+         enabled: true
+         masked: no
+
+    - name: Restarting kubelet agent
+      ansible.builtin.service:
+        name: kubelet
+        state: restarted
+        enabled: true
+    
+    - name: Initializing kubernetes Cluster
+      ansible.builtin.shell: sudo kubeadm init --pod-network-cidr=10.10.0.0/16
+
+    - name: Set up kubeconfig for user
+      shell: |
+        sudo mkdir -p $HOME/.kube
+        sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+        sudo chown $(id -u):$(id -g) $HOME/.kube/config
+
+    - name: CNI Plugin
+      ansible.builtin.shell: sudo kubectl apply -f https://raw.githubusercontent.com/projectcalico/calico/v3.25.0/manifests/calico.yaml
+
+    - name: Generate Kubernetes token for adding workers
+      shell: kubeadm token create --print-join-command  > $HOME/add_worker.sh
+
+    - name: Download add_worker.sh from /root/ on goku to the control machine
+      ansible.builtin.fetch:
+        src: /root/add_worker.sh # File path on the control plane
+        # Directory on your control machine where the downloaded file will be saved
+        # It will be saved as ./temp_fetched_scripts/goku/root/add_worker.sh by default
+        dest: /root/
+        flat: true # Optional: Save as ./temp_fetched_scripts/add_worker.sh directly
+
+- name: Copy add_worker.sh file to worker group
+  # The play will be executed on all hosts that belong to the 'worker' group in your inventory
+  hosts: worker # <--- Using your group
+
+  # You need root privileges on the destination hosts (worker1, worker2) to copy to /root/
+  become: true
+  become_user: root
+
+  tasks:
+    - name: Copy add_worker.sh to /root/ on the nodes of the worker group
+      ansible.builtin.copy:
+        # src: This is the path of the file on your control machine (where you run ansible-playbook)
+        #      Make sure this path is correct.
+        src: ./add_worker.sh # Example: if the file is next to your playbook
+
+        # dest: This is the destination path on each of the nodes in the 'worker' group
+        dest: /root/add_worker.sh
+
+        # Optional: Permissions for the copied file
+        mode: '0744' # rwxr--r--
+
+- hosts: worker
+  tasks:
+
+    - name: Delete .kube kubelet config file
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - $HOME/.kube #
+      ignore_errors: yes # In case is installed
+
+    - name: Stop the kubelet service (if running)
+      ansible.builtin.systemd:
+        name: kubelet
+        state: stopped
+        enabled: no # Optionally disable it from starting automatically
+      ignore_errors: yes # In case it's not running
+
+    - name: Reset kubeadm on workers node
+      ansible.builtin.command: kubeadm reset -f
+      become: yes
+      ignore_errors: yes
+
+
+    - name: Reboot the worker nodes (clean state)
+      ansible.builtin.reboot:
+        reboot_timeout: 300
+      become: yes
+
+    - name: Restarting kubelet agent
+      ansible.builtin.service:
+        name: kubelet
+        state: restarted
+        enabled: true
+
+    - name: Restarting Containerd
+      ansible.builtin.service:
+        name: containerd
+        state: restarted
+        enabled: true
+
+    - name: Executing command for add worker node to k8s
+      shell: sh $HOME/add_worker.sh
