@@ -291,8 +291,8 @@ Once your Kubernetes cluster is up and running, you'll want to interact with it 
     For getting started, the easiest way to access your applications in a test or local environment is often by using `NodePort`. If you are deploying to a cloud provider, `LoadBalancer` might be a better option for production.
 
 
-## Próximos Pasos
+## Next Steps
 
-**¡Ahora estás listo!** Con tu clúster Kubernetes desplegado y `kubectl` configurado, te animamos a comenzar tu exploración del vasto mundo de Kubernetes. Experimenta desplegando tus propias aplicaciones, descubriendo los diferentes tipos de Servicios y profundizando en conceptos como Deployments, StatefulSets, ConfigMaps y Secrets.
+**You are now ready!** With your Kubernetes cluster deployed and `kubectl` configured, we encourage you to begin your exploration of the vast world of Kubernetes. Experiment with deploying your own applications, discovering the different Service types, and delving deeper into concepts like Deployments, StatefulSets, ConfigMaps, and Secrets.
 
-**Te deseamos mucho éxito** en tu camino con Kubernetes. ¡Gracias por utilizar estos playbooks de Ansible para desplegar tu clúster!
+**We wish you great success** on your Kubernetes journey. Thank you for using these Ansible playbooks to deploy your cluster!
