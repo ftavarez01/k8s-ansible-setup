@@ -1,4 +1,4 @@
-- hosts: k8s
+- hosts: master
   become: yes
   become_user: root
   tasks:
