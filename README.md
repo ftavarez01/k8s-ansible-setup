@@ -81,16 +81,12 @@ worker1 ansible_host=WORKER_NODE_1_IP_OR_HOSTNAME
 worker2 ansible_host=WORKER_NODE_2_IP_OR_HOSTNAME
 # Add more worker nodes as needed
 
-#[all:vars]
-#ansible_user=root
-#ansible_ssh_private_key_file=~/.ssh/path/to/your/private_key # Uncomment and adjust if needed
-
 ## Installation and Configuration
 
 Follow these steps to deploy your Kubernetes cluster using the Ansible playbooks:
 
 1.  **Clone the Repository:**
-    Obtain a local copy of the playbooks and project files by cloning the repository from GitHub.
+
     ```bash
     git clone [https://github.com/ftavarez01/k8s-ansible-setup.git](https://github.com/ftavarez01/k8s-ansible-setup.git)
     cd k8s-ansible-setup
@@ -100,7 +96,7 @@ Follow these steps to deploy your Kubernetes cluster using the Ansible playbooks
     Within the cloned repository directory, you will find an inventory file named `hosts`. You need to edit this file to specify the IP addresses or hostnames of your Ubuntu servers where you will deploy Kubernetes.
 
     Open the `hosts` file with a text editor and update the `[master]` and `[worker]` sections with your server information.
-
+    
     ```ini
     # Example inventory file (./hosts)
     [master]
@@ -111,9 +107,6 @@ Follow these steps to deploy your Kubernetes cluster using the Ansible playbooks
     worker2 ansible_host=WORKER_NODE_2_IP_OR_HOSTNAME
     # Add more worker nodes as needed
 
-    [all:vars]
-    ansible_user=root # Ensure 'root' can SSH without a password
-    # ansible_ssh_private_key_file=~/.ssh/path/to/your/private_key # Uncomment and adjust if you are not using the default key
     ```
 
     * **Replace** `MASTER_NODE_IP_OR_HOSTNAME`, `WORKER_NODE_1_IP_OR_HOSTNAME`, `WORKER_NODE_2_IP_OR_HOSTNAME`, etc., with the actual IP addresses or hostnames of your servers.
@@ -134,7 +127,11 @@ Follow these steps to deploy your Kubernetes cluster using the Ansible playbooks
 
     Once the script has been executed successfully on all your managed nodes, SSH access with public key authentication should be configured.
 
-    ![SSH Key Flow Diagram](./images/ssh-connect.png)
+    Test ssh connect on servers
+
+    ``` bash
+       ssh root@worker1
+    ```
 
 4.  **Execute the Deployment Playbook:**
     After configuring your inventory file (`hosts`) and ensuring that SSH access is working correctly, you can execute the Ansible playbook to start the Kubernetes cluster deployment.
@@ -142,7 +139,7 @@ Follow these steps to deploy your Kubernetes cluster using the Ansible playbooks
     Navigate to the root directory of the cloned repository and run the following Ansible command:
 
     ```bash
-    ansible-playbook -i hosts site.yaml
+    ansible-playbook -i hosts kubernetes_setup.yaml
     ```
 
     * The `-i hosts` option tells Ansible to use the `hosts` file in the current directory as the inventory. If your inventory file has a different name, adjust it accordingly (e.g., `-i /path/to/my_inventory`).
@@ -178,11 +175,5 @@ Follow these steps to deploy your Kubernetes cluster using the Ansible playbooks
 
     These logs can provide clues about what is preventing the cluster from starting correctly.
 
-Regarding your repository:
 
-* The main playbook is named `site.yaml`.
-* The `distribute-ssh-keys.sh` script does not appear to need arguments, but it's important that the user runs `chmod +x distribute-ssh-keys.sh` to make it executable.
-* I've added troubleshooting suggestions, including checking logs, to help users diagnose deployment issues.
-
-What do you think of these changes? Would you like to add anything else, such as instructions for configuring `kubectl` locally?
   
