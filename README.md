@@ -94,7 +94,7 @@ Follow these steps to deploy your Kubernetes cluster using the Ansible playbooks
 1.  **Clone the Repository:**
 
     ```bash
-    git clone [https://github.com/ftavarez01/k8s-ansible-setup.git](https://github.com/ftavarez01/k8s-ansible-setup.git)
+    git clone https://github.com/ftavarez01/k8s-ansible-setup.git
     cd k8s-ansible-setup
     ```
 
