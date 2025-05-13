@@ -1,4 +1,4 @@
-- hosts: master
+- hosts: all_nodes
   become: yes
   become_user: root
   tasks:
