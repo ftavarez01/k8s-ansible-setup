@@ -54,7 +54,7 @@ The servers where the Kubernetes components will be installed must meet the foll
     * **Public Key Configuration:** The **public SSH key** of your control machine must be copied into the `~/.ssh/authorized_keys` file of the `ansible_user` on **each** of these nodes.
     * [Here you can add a reference to your script if you have one to help with public key distribution]: You can use the `./scripts/[your_ssh_script_name].sh` script included in this repository to automate this step.
 
-    [**-> YOU CAN INSERT THE SSH KEY FLOW DIAGRAM HERE <-**]
+    
     ![SSH Key Flow Diagram](images/ssh-connectivity.png)
 
 * **User with `sudo`:** The `ansible_user` must have permissions to execute commands as `root` using `sudo` **without being prompted for a password**. This is essential for Ansible to perform administrative tasks.
