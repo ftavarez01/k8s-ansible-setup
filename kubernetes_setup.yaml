@@ -145,7 +145,7 @@
         
 
 - name: Install Kubeadm Components on master node
-  hosts: master # Or specify the target node
+  hosts: master # Or specify the controlpalne node
   become: true
 
   tasks:
