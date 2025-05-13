@@ -79,6 +79,12 @@ master ansible_host=MASTER_NODE_IP_OR_HOSTNAME
 [worker]
 worker1 ansible_host=WORKER_NODE_1_IP_OR_HOSTNAME
 worker2 ansible_host=WORKER_NODE_2_IP_OR_HOSTNAME
+
+[all_nodes]
+master ansible_host=MASTER_NODE_IP_OR_HOSTNAME
+worker1 ansible_host=WORKER_NODE_1_IP_OR_HOSTNAME
+worker2 ansible_host=WORKER_NODE_2_IP_OR_HOSTNAME
+
 # Add more worker nodes as needed
 
 ## Installation and Configuration
