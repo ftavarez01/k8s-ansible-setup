@@ -54,7 +54,7 @@ The servers where the Kubernetes components will be installed must meet the foll
     * **Public Key Configuration:** The **public SSH key** of your control machine must be copied into the `/root/.ssh/authorized_keys` file of the `root` user on **each** of these nodes.
     * [Here you can add a reference to your script if you have one to help with public key distribution]: You can use the `./scripts/[your_ssh_script_name].sh` script included in this repository to automate this step.
 
-    ![SSH Key Flow Diagram](images/ssh-connectivity.png)
+    ![SSH Key Flow Diagram](images/ssh-connect.png)
 
 * **Passwordless `root` Access:** The `root` user must have the ability to execute commands without being prompted for a password (this is often the default configuration for the `root` user, but ensure this is the case on your servers).
 * **Python 3.x:** Python version 3.x installed on each managed node.
