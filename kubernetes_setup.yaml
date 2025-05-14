@@ -283,3 +283,10 @@
 
     - name: Executing command for add worker node to k8s
       shell: sh $HOME/add_worker.sh
+
+- hosts: master
+  tasks:
+
+    - name: Finalize Kubernetes Setup
+      ansible.builtin.debug:
+        msg: "Kubernetes setup complete.  Your cluster is now operational.  #DevOps"
