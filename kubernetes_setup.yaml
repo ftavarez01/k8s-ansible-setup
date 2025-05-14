@@ -232,7 +232,7 @@
       ansible.builtin.copy:
         # src: This is the path of the file on your control machine (where you run ansible-playbook)
         #      Make sure this path is correct.
-        src: ./add_worker.sh # Example: if the file is next to your playbook
+        src: /root/add_worker.sh # Example: if the file is next to your playbook
 
         # dest: This is the destination path on each of the nodes in the 'worker' group
         dest: /root/add_worker.sh
